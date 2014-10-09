@@ -1,23 +1,40 @@
 #ifndef _QUICKSORT_H
 #define _QUICKSORT_H
 
-#include <stdio.h>
-
 class QuickSort {
 public:
-	void quickSort(int array[], int left, int right, int pivotIndex);
-
-	void printArray(int array[], int length) {
-		for (int i = 0; i < length; ++i) {
-			printf("%d ", array[i]);
-		}
-	}
+	void quickSort(int array[], int left, int right); //array index range [left, right]
 
 private:
-	int partition(int *array, int left, int right, int pivotIndex, int pivotValue);
+	int selectPivot(int array[], int left, int right);
+	int partition(int *array, int left, int right, int pivotIndex);
 };
 
-int QuickSort::partition(int array[], int left, int right, int pivotIndex, int pivotValue) {
+//ÖÐÎ»Êý
+int QuickSort::selectPivot(int array[], int left, int right) {
+	int middle = (left + right) >> 1;
+	int temp[4] = {array[left], array[right], left, right};
+	
+	//keep temp[0] > temp[1]
+	if (array[left] < array[right]) {
+		temp[0] = array[right];
+		temp[1] = array[left];
+		temp[2] = right;
+		temp[3] = left;
+	}
+
+	if (array[middle] > temp[0])
+		return temp[2];
+
+	if (array[middle] < temp[1])
+		return temp[3];
+
+	return middle;
+}
+
+int QuickSort::partition(int array[], int left, int right, int pivotIndex) {
+	int pivotValue = array[pivotIndex];
+
 	while (left < right) {
 		while (left <= right && array[left] <= pivotValue)
 			++left;
@@ -32,24 +49,26 @@ int QuickSort::partition(int array[], int left, int right, int pivotIndex, int p
 		}
 	}
 
-	if (right >= 0 && pivotIndex <= right) {
+	if (pivotIndex < right) {
 		array[pivotIndex] = array[right];
 		array[right] = pivotValue;
+	}
+	else if (pivotIndex > left){
+		array[pivotIndex] = array[left];
+		array[left] = pivotValue;
 	}
 
 	return right;
 }
 
-void QuickSort::quickSort(int array[], int left, int right, int pivotIndex) {
-	int currentLeft = partition(array, left, pivotIndex - 1, left, array[left]);
-	int currrentRight = partition(array, pivotIndex + 1, right, pivotIndex + 1, array[pivotIndex + 1]);
+void QuickSort::quickSort(int array[], int left, int right) {
+	if (left < right) {
+		int pivotIndex = selectPivot(array, left, right);
+		int sortedIndex = partition(array, left, right, pivotIndex);
 
-	if (left < pivotIndex - 1)
-		quickSort(array, left, pivotIndex - 1, currentLeft);
-	
-	if (pivotIndex + 1 < right)
-		quickSort(array, pivotIndex + 1, right, currrentRight);
-	
+		quickSort(array, left, sortedIndex - 1);
+		quickSort(array, sortedIndex + 1, right);
+	}
 }
 
 #endif
