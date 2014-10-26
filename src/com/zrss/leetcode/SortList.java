@@ -12,156 +12,70 @@ class ListNode {
     }
 }
 
-/**
- * Definition for partition method result value
- *
- */
-class PartitionResult {
-    ListNode head;
-    ListNode tail;
-    ListNode pre_pivot;
-    ListNode pivot_node;
-    
-    public PartitionResult(ListNode head, ListNode tail) {
-        // TODO Auto-generated constructor stub
-        this.head = head;
-        this.tail = tail;
-        pre_pivot = null;
-        pivot_node = null;
-    }
-}
-
 public class SortList {
-    ListNode head = null;
-    
-    private void swap(ListNode prei, ListNode i, ListNode prej, ListNode j) {
-        if (i != prej) { //i isn't adjacent to j
-            if (prei != null) //prei == null means i is the list's head
-                prei.next = j;
-            
-            ListNode cpy = j.next;
-            j.next = i.next;
-            
-            prej.next = i;
-            i.next = cpy; 
-        }
-        else { //i adjacent to j means i == prej
-            if (prei != null) //prei == null means i is the list's head
-                prei.next = j;
-            
-            ListNode cpy = j.next;
-            j.next = i;
-            i.next = cpy;
-        }
-    }
-    
     /**
-     * partition [p, r] inplace and return [head, tail, pre_pivot, pivot_node]
+     * core idea is the link not swap
+     * head != null
+     * and use the head node as a pivot node
      * 
-     * @param preP
-     * @param p
-     * @param r
-     * @param nextR
-     * @return
+     * [head, tail)
+     * 
+     * @param head
+     * @param tail
+     * @return current head node
      */
-    private PartitionResult partition(ListNode prep, ListNode p, ListNode r) {
-        int pivot_element = r.val;
+    private ListNode partition(ListNode head, ListNode tail) {   
+        int x = head.val;
         
-        PartitionResult partitionResult = new PartitionResult(p, r);
+        //l1 <= x
+        //l2 > x        
+        ListNode l1Head = new ListNode(-1), l1Itr = l1Head;
+        ListNode l2Head = new ListNode(-1), l2Itr = l2Head;
         
-        ListNode i = prep;
-        ListNode prei = null;
-        ListNode prej = prep;
-       
-        for (ListNode j = p; j != r; prej = j, j = j.next) {
-            if (j.val <= pivot_element) {
-                
-                prei = i;
-                
-                //++i
-                if (i != null) {
-                    i = i.next;
-                }
-                else {
-                    i = partitionResult.head;
-                    partitionResult.head = j; //modify cur head
-                    
-                    if (this.head == i)
-                        this.head = j;
-                }
-
-                //swap i node and j node
-                if (i != j) {
-                    swap(prei, i, prej, j);
-                    
-                    //swap i and j reference
-                    ListNode cpy = i;
-                    i = j;
-                    j = cpy;
-                }
+        for (ListNode itr = head.next; itr != tail; itr = itr.next) {
+            if (itr.val <= x) {
+                l1Itr.next = itr;
+                l1Itr = itr;
+            }
+            else {
+                l2Itr.next = itr;
+                l2Itr = itr;
             }
         }
         
-        //swap i + 1 node and r node
-        if (i != null) {
-            prei = i;
-            i = i.next;
-        }
-        else {
-            i = partitionResult.head;
-            partitionResult.head = r;
-            
-            if (this.head == i)
-                this.head = r;
-        }
+        //l1->x->l2->tail
+        l1Itr.next = head;
+        l2Itr.next = tail; //if l2Head == l2Itr
+        head.next = l2Head.next;
         
-        swap(prei, i, prej, r);
+        //useless node set to null
+        ListNode relHead = l1Head.next;
+        l1Head = null;
+        l2Head = null;
         
-        ListNode cpy = i;
-        i = r;
-        r = cpy;
-        
-        //modify tail
-        partitionResult.tail = i;
-        
-        //set new pre pivot node and pivot node
-        partitionResult.pre_pivot = prej;
-        partitionResult.pivot_node = i; 
-                
-        return partitionResult;
+        return relHead;
     }
     
-    
-    /**
-     * single linked list quickSort [head, tail]
-     * @param head
-     * @param tail
-     * @return
-     */
-    private void quickSort(ListNode preHead, ListNode head, ListNode tail) {        
-        if (head != null && tail != null && head != tail) {
-            PartitionResult partitionResult = partition(preHead, head, tail);
+    //quick sort for list
+    private ListNode quickSort(ListNode head, ListNode tail) {
+        ListNode curHead = head;
+        
+        if (head != tail) {
+            curHead = partition(head, tail); //after partition head node play a pivot role
             
-            quickSort(preHead, partitionResult.head, partitionResult.pre_pivot);
+            curHead = quickSort(curHead, head); //maintain head node
             
-            if (partitionResult.pivot_node != partitionResult.tail)
-                quickSort(partitionResult.pivot_node, partitionResult.pivot_node.next, partitionResult.tail);
+            head.next = quickSort(head.next, tail); //link two parts
         }
+        
+        return curHead;
     }
     
-    public void sortList(ListNode head) {
-        this.head = head;
-        ListNode tail = null;
-        
-        for (ListNode itr = head; itr != null; tail = itr, itr = itr.next);
-        
-        quickSort(null, head, tail);
-    }
     
     public static void main(String[] args) {
         // TODO Auto-generated method stub
         
-        Integer [] nums = {10, 1, 3, 4, 6, 2};
+        Integer [] nums = {1,3,3,1,3,1,3,3,2,3,2,2,1,1,1,3,2,2,1,1,2,2,2,3,3,1,1};
         
         ListNode head = null;
         ListNode pre = null;
@@ -180,9 +94,9 @@ public class SortList {
         
         SortList sortList = new SortList();
         
-        sortList.sortList(head);
+        head = sortList.quickSort(head, null);
         
-        for (ListNode itr = sortList.head; itr != null; itr = itr.next) {
+        for (ListNode itr = head; itr != null; itr = itr.next) {
             System.out.println(itr.val);
         }
     }
