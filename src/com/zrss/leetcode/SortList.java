@@ -1,5 +1,12 @@
 package com.zrss.leetcode;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+
 /**
  * Definition for singly-linked list.
  */
@@ -22,18 +29,32 @@ public class SortList {
      * 
      * @param head
      * @param tail
-     * @return current head node
+     * @return [leftPartHead, leftPartEndNode]
      */
-    private ListNode partition(ListNode head, ListNode tail) {   
-        int x = head.val;
+    private ListNode[] partition(ListNode head, ListNode tail) {
+        //cal avg as the pivot value
+        int sum = 0, count = 0;
+        
+        for (ListNode itr = head; itr != tail; itr = itr.next) {
+            sum += itr.val;
+            ++count;
+        }
+        
+        float x = (float)sum / count;
+        
+        boolean same = true;
         
         //l1 <= x
         //l2 > x        
         ListNode l1Head = new ListNode(-1), l1Itr = l1Head;
         ListNode l2Head = new ListNode(-1), l2Itr = l2Head;
         
-        for (ListNode itr = head.next; itr != tail; itr = itr.next) {
-            if (itr.val <= x) {
+        for (ListNode itr = head, pre = head; itr != tail; pre = itr, itr = itr.next) {
+            if (itr.val != pre.val) {
+                same = false;
+            }
+            
+            if (itr.val < x) {
                 l1Itr.next = itr;
                 l1Itr = itr;
             }
@@ -43,29 +64,40 @@ public class SortList {
             }
         }
         
-        //l1->x->l2->tail
-        l1Itr.next = head;
-        l2Itr.next = tail; //if l2Head == l2Itr
-        head.next = l2Head.next;
+        ListNode [] listNodes = new ListNode[2];
         
+        listNodes[0] = l1Head.next;
+        
+        if (!same) {
+            //l1->l2->tail
+            l2Itr.next = tail; //if l2Head == l2Itr
+            l1Itr.next = l2Head.next;
+                    
+            listNodes[1] = l1Itr;
+        }
+        else {
+            listNodes[1] = l1Head.next;
+        }
+
         //useless node set to null
-        ListNode relHead = l1Head.next;
         l1Head = null;
         l2Head = null;
         
-        return relHead;
+        return listNodes;
     }
     
     //quick sort for list
     private ListNode quickSort(ListNode head, ListNode tail) {
         ListNode curHead = head;
         
-        if (head != tail) {
-            curHead = partition(head, tail); //after partition head node play a pivot role
+        if (head != tail && head.next != tail) {
+            ListNode [] rel = partition(head, tail); //after partition head node play a pivot role
             
-            curHead = quickSort(curHead, head); //maintain head node
-            
-            head.next = quickSort(head.next, tail); //link two parts
+            if (rel[0] != null) {
+                curHead = quickSort(rel[0], rel[1].next); //maintain head node
+                
+                rel[1].next = quickSort(rel[1].next, tail); //link the two parts
+            }
         }
         
         return curHead;
@@ -75,13 +107,47 @@ public class SortList {
     public static void main(String[] args) {
         // TODO Auto-generated method stub
         
-        Integer [] nums = {1,3,3,1,3,1,3,3,2,3,2,2,1,1,1,3,2,2,1,1,2,2,2,3,3,1,1};
+        int x = 4;
+        float y = (float) 4.0;
+        
+        if (x < y) {
+            System.out.println("le");
+        }
+        else {
+            System.out.println("gt");
+        }
+        
+        ArrayList<Integer> nums = new ArrayList<Integer>();
+        
+        String textDataFile = "C:\\textDataFile.txt";
+        
+        try {
+            InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(textDataFile));
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            
+            String total = bufferedReader.readLine();
+            
+            bufferedReader.close();
+            
+            String [] parts = total.split(",");
+
+            for (String i:parts) {
+                nums.add(Integer.valueOf(i));
+            }
+            
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         
         ListNode head = null;
         ListNode pre = null;
         
-        for (int i = 0; i < nums.length; ++i) {
-            ListNode itr = new ListNode(nums[i]);
+        for (Integer i:nums) {
+            ListNode itr = new ListNode(i);
             
             if (head == null)
                 head = itr;
