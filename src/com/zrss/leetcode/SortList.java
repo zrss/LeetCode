@@ -21,102 +21,79 @@ class ListNode {
 
 public class SortList {
     /**
-     * core idea is the link not swap
-     * head != null
-     * and use the head node as a pivot node
+     * merge l1 and l2 list
      * 
-     * [head, tail)
-     * 
-     * @param head
-     * @param tail
-     * @return [leftPartHead, leftPartEndNode]
+     * @param l1
+     * @param l2
+     * @return
      */
-    private ListNode[] partition(ListNode head, ListNode tail) {
-        //cal avg as the pivot value
-        int sum = 0, count = 0;
+    private ListNode merge(ListNode l1, ListNode l2) {
+        ListNode head = new ListNode(-1), itr = head;
         
-        for (ListNode itr = head; itr != tail; itr = itr.next) {
-            sum += itr.val;
-            ++count;
-        }
-        
-        float x = (float)sum / count; //notice if int x will lead to infinite loop (for example -39 -38)
-        
-        boolean same = true;
-        
-        //l1 <= x
-        //l2 > x        
-        ListNode l1Head = new ListNode(-1), l1Itr = l1Head;
-        ListNode l2Head = new ListNode(-1), l2Itr = l2Head;
-        
-        for (ListNode itr = head, pre = head; itr != tail; pre = itr, itr = itr.next) {
-            if (itr.val != pre.val) {
-                same = false;
-            }
-            
-            if (itr.val < x) {
-                l1Itr.next = itr;
-                l1Itr = itr;
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                itr.next = l1;
+                itr = l1;
+                l1 = l1.next;
             }
             else {
-                l2Itr.next = itr;
-                l2Itr = itr;
+                itr.next = l2;
+                itr = l2;
+                l2 = l2.next;
             }
         }
         
-        ListNode [] listNodes = new ListNode[2];
+        //deal l1 or l2 remain element
+        ListNode remail = null;
         
-        listNodes[0] = l1Head.next;
-        
-        if (!same) {
-            //l1->l2->tail
-            l2Itr.next = tail; //if l2Head == l2Itr
-            l1Itr.next = l2Head.next;
-                    
-            listNodes[1] = l1Itr;
+        if (l1 == null && l2 != null) {
+            remail = l2;
         }
-        else {
-            listNodes[1] = l1Head.next;
+        else if (l2 == null && l1 != null) {
+            remail = l1;
         }
-
-        //useless node set to null
-        l1Head = null;
-        l2Head = null;
         
-        return listNodes;
+        itr.next = remail;
+        
+        ListNode relHead = head.next;
+        head = null;
+        
+        return relHead;
     }
     
-    //quick sort for list
-    private ListNode quickSort(ListNode head, ListNode tail) {
-        ListNode curHead = head;
-        
-        if (head != tail && head.next != tail) {
-            ListNode [] rel = partition(head, tail); //after partition head node play a pivot role
+    private ListNode mergeSort(ListNode head, ListNode tail) {
+        if (head.next == tail) { //single node
+            head.next = null;
+            return head;
+        }
             
-            if (rel[0] != null) { //when rel[0] means that remain element is the same
-                curHead = quickSort(rel[0], rel[1].next); //maintain head node
-                
-                rel[1].next = quickSort(rel[1].next, tail); //link the two parts
+        //locate the middle node
+        //2 * mid = len
+        //itr += 2; mid += 1;
+        ListNode itr = head, mid = head;
+        while (itr != tail) {
+            itr = itr.next;
+            
+            if (itr != tail) {
+                itr = itr.next;
             }
+            
+            mid = mid.next;
         }
         
-        return curHead;
+        ListNode l1 = mergeSort(head, mid);
+        
+        ListNode l2 = mergeSort(mid, tail);
+        
+        return merge(l1, l2);
     }
-    
-    
+
+    public ListNode sortList(ListNode head) {
+        return mergeSort(head, null);
+    }
+
     public static void main(String[] args) {
         // TODO Auto-generated method stub
-        
-        int x = 4;
-        float y = (float) 4.0;
-        
-        if (x < y) {
-            System.out.println("le");
-        }
-        else {
-            System.out.println("gt");
-        }
-        
         ArrayList<Integer> nums = new ArrayList<Integer>();
         
         String textDataFile = "C:\\textDataFile.txt";
@@ -160,7 +137,7 @@ public class SortList {
         
         SortList sortList = new SortList();
         
-        head = sortList.quickSort(head, null);
+        head = sortList.mergeSort(head, null);
         
         for (ListNode itr = head; itr != null; itr = itr.next) {
             System.out.println(itr.val);
