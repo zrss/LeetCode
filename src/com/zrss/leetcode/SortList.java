@@ -70,6 +70,7 @@ public class SortList {
         //locate the middle node
         //2 * mid = len
         //itr += 2; mid += 1;
+        //notice that itr and mid start from the first node so it is not a exact middle location
         ListNode itr = head, mid = head;
         while (itr != tail) {
             itr = itr.next;
@@ -89,6 +90,9 @@ public class SortList {
     }
 
     public ListNode sortList(ListNode head) {
+        if (head == null) //trap
+            return null;
+        
         return mergeSort(head, null);
     }
 
