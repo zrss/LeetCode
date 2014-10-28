@@ -40,7 +40,7 @@ public class SortList {
             ++count;
         }
         
-        float x = (float)sum / count;
+        float x = (float)sum / count; //notice if int x will lead to infinite loop (for example -39 -38)
         
         boolean same = true;
         
@@ -93,7 +93,7 @@ public class SortList {
         if (head != tail && head.next != tail) {
             ListNode [] rel = partition(head, tail); //after partition head node play a pivot role
             
-            if (rel[0] != null) {
+            if (rel[0] != null) { //when rel[0] means that remain element is the same
                 curHead = quickSort(rel[0], rel[1].next); //maintain head node
                 
                 rel[1].next = quickSort(rel[1].next, tail); //link the two parts
