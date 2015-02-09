@@ -40,7 +40,7 @@ bool cmp(const int& a, const int& b) {
 	Integer ia(a);
 	Integer ib(b);
 
-	int maxCmpCount = ia.getCount() + ib.getCount();
+	int maxCmpCount = ia.getCount() + ib.getCount() - 1;
 	int curCmpCount = 0;
 
 	while (curCmpCount < maxCmpCount) {
