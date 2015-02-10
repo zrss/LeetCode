@@ -1,67 +1,62 @@
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <cstdio>
 #include <iostream>
 
 class Solution {
 public:
     std::vector<std::string> findRepeatedDnaSequences(std::string s);
-
-    ~Solution();
-
-private:
-	std::size_t* next;
 };
 
 std::vector<std::string> Solution::findRepeatedDnaSequences(std::string s) {
 	std::vector<std::string> rel;
-
 	if (s.length() <= 10) {
 		return rel;
 	}
 
-	next = new std::size_t[s.length()];
+	// map char to code
+	unsigned char convert[26];
+	convert[0] = 0; // 'A' - 'A'  00
+	convert[2] = 1; // 'C' - 'A'  01
+	convert[6] = 2; // 'G' - 'A'  10
+	convert[19] = 3; // 'T' - 'A' 11
 
-	// cal next array
-	for (int pos = 0; pos < s.length(); ++pos) {
-		next[pos] = s.find_first_of(s[pos], pos + 1);
+	// initial process
+	// as ten length string
+	int hashValue = 0;
+
+	for (int pos = 0; pos < 10; ++pos) {
+		hashValue <<= 2;
+		hashValue |= convert[s[pos] - 'A'];
 	}
 
-	for (int pos = 0; pos < s.length(); ++pos) {
-		std::size_t nextPos = next[pos];
-		while (nextPos != std::string::npos) {
-			int ic = pos;
-			int in = nextPos;
-			int count = 0;
-			while (in != s.length() && count < 9 && s[++ic] == s[++in]) {
-				++count;
+	std::unordered_map<int, int> strTable; // strHashValue, count
+
+	strTable.insert(std::pair<int, int>(hashValue, 1));
+
+	// 
+	for (int pos = 10; pos < s.length(); ++pos) {
+		hashValue <<= 2;
+		hashValue |= convert[s[pos] - 'A'];
+		hashValue &= ~(0x300000);
+		auto itr = strTable.find(hashValue);
+		if (itr == strTable.end()) {
+			strTable.insert(std::pair<int, int>(hashValue, 1));
+		} else {
+			if (itr->second == 1) {
+				rel.push_back(s.substr(pos - 9, 10));
+				++(itr->second);
 			}
-			if (count == 9) {
-				std::string tmp = s.substr(pos, 10);
-				bool repeat = false;
-				for (auto itr = rel.begin(); !repeat && itr != rel.end(); ++itr) {
-					if (*itr == tmp) {
-						repeat = true;
-					}
-				}
-				if (!repeat) {
-					rel.push_back(tmp);
-				}
-			}
-			nextPos = next[nextPos];
 		}
 	}
 
-	return rel;
-}
-
-Solution::~Solution() {
-	delete [] next;
+	return rel; 
 }
 
 int main(int argc, char const *argv[]) {
 	Solution solution;
-	std::string textStr("AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT");
+	std::string textStr("AAAAAAAAAAA");
 	auto rel = solution.findRepeatedDnaSequences(textStr);
 	for (auto itr = rel.begin(); itr != rel.end(); ++itr) {
 		std::cout << *itr << "\n";
