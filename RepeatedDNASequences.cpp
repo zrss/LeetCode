@@ -1,8 +1,11 @@
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <cstdio>
-#include <iostream>
+#include <unordered_set>
+#include <cstring>
+#include <cstdio> // for output
+#include <iostream> // for output
+
+bool hashMap[1024*1024];
 
 class Solution {
 public:
@@ -24,6 +27,8 @@ std::vector<std::string> Solution::findRepeatedDnaSequences(std::string s) {
 
 	// initial process
 	// as ten length string
+	memset(hashMap, false, sizeof(hashMap));
+
 	int hashValue = 0;
 
 	for (int pos = 0; pos < 10; ++pos) {
@@ -31,23 +36,23 @@ std::vector<std::string> Solution::findRepeatedDnaSequences(std::string s) {
 		hashValue |= convert[s[pos] - 'A'];
 	}
 
-	std::unordered_map<int, int> strTable; // strHashValue, count
+	hashMap[hashValue] = true;
 
-	strTable.insert(std::pair<int, int>(hashValue, 1));
+	std::unordered_set<int> strHashValue;
 
 	// 
 	for (int pos = 10; pos < s.length(); ++pos) {
 		hashValue <<= 2;
 		hashValue |= convert[s[pos] - 'A'];
 		hashValue &= ~(0x300000);
-		auto itr = strTable.find(hashValue);
-		if (itr == strTable.end()) {
-			strTable.insert(std::pair<int, int>(hashValue, 1));
-		} else {
-			if (itr->second == 1) {
+		
+		if (hashMap[hashValue]) {
+			if (strHashValue.find(hashValue) == strHashValue.end()) {
 				rel.push_back(s.substr(pos - 9, 10));
-				++(itr->second);
+				strHashValue.insert(hashValue);
 			}
+		} else {
+			hashMap[hashValue] = true;
 		}
 	}
 
@@ -56,7 +61,7 @@ std::vector<std::string> Solution::findRepeatedDnaSequences(std::string s) {
 
 int main(int argc, char const *argv[]) {
 	Solution solution;
-	std::string textStr("AAAAAAAAAAA");
+	std::string textStr("GAGAGAGAGAGA");
 	auto rel = solution.findRepeatedDnaSequences(textStr);
 	for (auto itr = rel.begin(); itr != rel.end(); ++itr) {
 		std::cout << *itr << "\n";
