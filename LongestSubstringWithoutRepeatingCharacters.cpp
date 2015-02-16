@@ -1,5 +1,4 @@
 #include <string>
-#include <unordered_set>
 #include <iostream>
 
 class Solution {
@@ -9,11 +8,12 @@ public:
     	int start = 0;
     	int end = 0;
 
-    	std::unordered_set<char> hashTable;
+    	bool hashTable[256];
+    	memset(hashTable, false, sizeof(hashTable));
     	
     	while (true) {
-	    	while (end < s.length() && hashTable.find(s[end]) == hashTable.end()) {
-	    		hashTable.insert(s[end]);
+	    	while (end < s.length() && !hashTable[s[end]]) {
+	    		hashTable[s[end]] = true;
 	    		++end;
 	    	}
 
@@ -30,10 +30,10 @@ public:
 	    			start = i + 1;
 	    			break;
 	    		}
-	    		hashTable.erase(s[i]);
+	    		hashTable[s[i]] = true;
 	    	}
 
-	    	hashTable.insert(s[end]);
+	    	hashTable[s[end]] = true;
 	    	++end;
     	}
 
@@ -44,7 +44,7 @@ public:
 int main(int argc, char const *argv[])
 {
 	Solution solution;
-	std::string test("aaabc");
+	std::string test("AAAAAaa");
 	std::cout << solution.lengthOfLongestSubstring(test) << std::endl;
 	return 0;
 }
