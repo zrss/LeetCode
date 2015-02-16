@@ -4,59 +4,49 @@
 
 class Solution {
 public:
-    std::string longestPalindrome(std::string s) {
-    	// there is a trap when s is a single char
-    	if (s.length() <= 1) {
-    		return s;
-    	}
+	Solution():maxLen(0) {};
 
-    	std::string lP;
-    	int maxCount = 0;
+    std::string longestPalindrome(std::string s);
 
-        // odd length
-        for (int i = 1; i < s.length(); ++i) {
-        	int count = 1;
-        	int left = i - 1;
-        	int right = i + 1;
+private:
+	void calPalindrome(std::string& s, int len, int left, int right);
 
-        	while (left >= 0 && right < s.length() && (s[left] == s[right])) {
-        		count += 2;
-        		--left;
-        		++right;
-        	}
-
-        	if (count > maxCount) {
-        		maxCount = count;
-        		lP = s.substr(left + 1, count);
-        	}
-        }
- 
-        // even length
-        for (int i = 0; i < s.length(); ++i) {
-        	int count = 0;
-        	int left = i;
-        	int right = i + 1;
-
-        	while (left >= 0 && right < s.length() && (s[left] == s[right])) {
-        		count += 2;
-        		--left;
-        		++right;
-        	}
-
-        	if (count > maxCount) {
-        		maxCount = count;
-        		lP = s.substr(left + 1, count);
-        	}
-        }
-
-        return lP;
-    }
+private:
+	std::string rel;
+	int maxLen;
 };
+
+void Solution::calPalindrome(std::string& s, int len, int left, int right) {
+    while (left >= 0 && right < s.length() && (s[left] == s[right])) {
+		len += 2;
+		--left;
+		++right;
+	}
+
+	if (len > maxLen) {
+		maxLen = len;
+		rel = s.substr(left + 1, len);
+	}
+}
+
+std::string Solution::longestPalindrome(std::string s) {
+	// there is a trap when s is a single char
+	if (s.length() <= 1) {
+		return s;
+	}
+
+	for (int i = 0; i < s.length(); ++i) {
+		calPalindrome(s, 0, i, i + 1); // even length
+		calPalindrome(s, 1, i - 1, i + 1); // odd length
+	}
+
+	return rel;
+}
 
 int main(int argc, char const *argv[])
 {
 	Solution solution;
-	std::string test("jkljljljjjlj");
+	std::string test("fsdajfdsjlll");
 	std::cout << solution.longestPalindrome(test) << std::endl;
 	return 0;
 }
