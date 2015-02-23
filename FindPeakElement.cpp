@@ -4,25 +4,29 @@
 class Solution {
 public:
     int findPeakElement(const std::vector<int> &num) {
-        if (num.size() == 1) {
-        	return 0;
-        }
+    	if (num.size() == 1 || num[0] > num[1]) {
+    		return 0;
+    	}
 
-        if (num[0] > num[1]) {
-        	return 0;
-        }
+    	if (*(num.rbegin()) > *(++num.rbegin())) {
+    		return num.size() - 1;
+    	}
 
-        if (*(num.rbegin()) > *(++num.rbegin())) {
-        	return num.size() - 1;
-        }
+        int l = 0;
+        int u = num.size() - 1;
 
-
-        int count = num.size() - 1;
-        for (int i = 1; i < count; ++i) {
-        	if (num[i] > num[i - 1] && num[i] > num[i + 1]) {
-        		return i;
+        while (l < u) {
+        	int mid = (l + u) >> 1;
+        	if (num[mid] > num[mid - 1] && num[mid] > num[mid + 1]) {
+        		return mid;
+        	} else if (num[mid] > num[mid - 1]) {
+        		l = mid + 1;
+        	} else {
+        		u = mid;
         	}
         }
+
+        return l;
     }
 };
 
