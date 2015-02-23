@@ -15,6 +15,7 @@ public:
             rel += '-';
         }
 
+        // there is another trap int -2147483648
         long num = numerator < 0 ? -((long)numerator) : numerator;
         long den = denominator < 0 ? -((long)denominator) : denominator;
 
