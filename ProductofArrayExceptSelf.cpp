@@ -6,34 +6,20 @@ using namespace std;
 class Solution {
 public:
     vector<int> productExceptSelf(vector<int>& nums) {
-    	vector<int> rel;
+    	vector<int> rel(nums.size(), 0);
 
-    	if (nums.size() == 0) {
-    		return rel;
-    	}
-
-    	vector<int> f(nums.size(), 0);
-    	vector<int> b(nums.size(), 0);
-
-    	f[0] = nums[0];
+        // left product i
+        rel[0] = 1;
     	for (int i = 1; i < nums.size(); ++i) {
-    		f[i] = nums[i] * f[i - 1];
-    	}
+            rel[i] = nums[i - 1] * rel[i - 1];
+        }
 
-    	b[nums.size() - 1] = nums[nums.size() - 1];
-    	for (int i = nums.size() - 2; i >= 0; --i) {
-    		b[i] = nums[i] * b[i + 1];
-    	}
-
-    	for (int i = 0; i < nums.size(); ++i) {
-    		if (i != 0 && i != nums.size() - 1) {
-    			rel.push_back(f[i - 1] * b[i + 1]);
-    		} else if (i == 0) {
-                rel.push_back(b[i + 1]);
-            } else {
-                rel.push_back(f[i - 1]);
-            }
-    	}
+        // i right product
+        int tmp = 1;
+        for (int i = nums.size() - 2; i >= 0; --i) {
+            tmp *= nums[i + 1];
+            rel[i] *= tmp;
+        }
 
         return rel;
     }
