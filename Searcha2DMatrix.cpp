@@ -9,7 +9,7 @@ public:
     	if (matrix.size() == 0 || matrix[0].size() == 0) {
     		return false;
     	}
-    	
+
     	int row = locateRow(matrix, target);
     	if (row == -1) {
     		return false;
