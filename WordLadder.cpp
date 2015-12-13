@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <unordered_set>
-#include <queue>
 #include <string>
 
 using namespace std;
@@ -9,55 +8,59 @@ using namespace std;
 class Solution {
 public:
     int ladderLength(string beginWord, string endWord, unordered_set<string>& wordList) {
-    	int maxlevel = 1;
-    	queue<pair<string, int>> queue;
-    	queue.push(pair<string, int>(beginWord, maxlevel));
+        if (beginWord.length() != endWord.length()) {
+            return 0;
+        }
 
-    	wordList.insert(endWord);
+        unordered_set<string> activeWord[3];
+        int startSet = 0, nextSet = 1, endSet = 2;
 
-    	while (!queue.empty()) {
-    		pair<string, int> cur = queue.front();
-    		queue.pop();
+        activeWord[startSet].insert(beginWord);
+        activeWord[endSet].insert(endWord);
 
-    		if (cur.second > maxlevel) {
-    			maxlevel = cur.second;
-    		}
+        wordList.erase(beginWord);
+        wordList.erase(endWord);
 
-    		if (cur.second == maxlevel - 2) {
-    			break;
-    		}
+        int len = beginWord.length();
 
-    	    // traverse dict
-    	    for (auto itr = wordList.begin(); itr != wordList.end(); ) {
-    	    	if (diffOne(*itr, cur.first)) {
-    	    		if (*itr == endWord) {
-    	    			return cur.second + 1;
-    	    		}
-    	    		queue.push(pair<string, int>(*itr, cur.second + 1));
+        int step = 1;
 
-    	    		itr = wordList.erase(itr);
-    	    	} else {
-    	    		++itr;
-    	    	}
-    	    }
-    	}
+        // 所有单词都是一个长度
+        while (!activeWord[startSet].empty()) {
+            for (auto it : activeWord[startSet]) { // 遍历候选集
+                for (int i = 0; i < len; ++i) { // 遍历单词每个字母
+                    char tmp = it[i];
+                    for (char j = 'a'; j <= 'z'; ++j) { // 尝试替换字母
+                        if (it[i] != j) {
+                            it[i] = j;
 
-    	return 0;
-    }
+                            // 判断是否在结尾集中
+                            if (activeWord[endSet].count(it) > 0) {
+                                return step + 1;
+                            }
 
-    bool diffOne(const string& a, const string& b) {
-    	if (a.length() != b.length()) { // problem definition
-    		return false;
-    	}
+                            // 判断是否在字典集中
+                            auto word = wordList.find(it);
+                            if (word != wordList.end()) { // 加入下一集中
+                                activeWord[nextSet].insert(it);
+                                wordList.erase(word); // 从字典集中去除
+                            }
+                        }
+                    }
+                    it[i] = tmp;
+                }
+            }
 
-    	int diff = 0;
-    	for (int i = 0; diff < 2 && i < a.length(); ++i) {
-    		if (a[i] != b[i]) {
-    			++diff;
-    		}
-    	}
+            ++step;
 
-    	return diff == 1;
+            swap(activeWord[startSet], activeWord[nextSet]);
+            activeWord[nextSet].clear(); // 设置nextSet为空
+            if (activeWord[startSet].size() > activeWord[endSet].size()) {
+                swap(activeWord[startSet], activeWord[endSet]);
+            }
+        }
+
+        return 0;
     }
 };
 
