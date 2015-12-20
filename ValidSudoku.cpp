@@ -49,8 +49,9 @@ public:
         }
 
         // grid
-        for (int x = 0; x < 7; ++x) {
-        	for (int y = 0; y < 7; ++y) {
+        // 理解错题意了之前，只有9个子正方形
+        for (int x = 0; x < 7; x += 3) {
+        	for (int y = 0; y < 7; y += 3) {
         		if (!checkGrid(board, x, y)) {
         			return false;
         		}
