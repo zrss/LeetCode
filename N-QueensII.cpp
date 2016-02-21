@@ -5,7 +5,7 @@ using namespace std;
 
 class Solution {
 public:
-    int solveNQueens(int n) {
+    int totalNQueens(int n) {
         vector<string> board(n, string(n, '.'));
         int rel = 0;
 
