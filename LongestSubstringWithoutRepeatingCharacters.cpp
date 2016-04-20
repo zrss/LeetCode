@@ -1,50 +1,57 @@
 #include <string>
 #include <iostream>
 
+using namespace std;
+
+// start 指向区间头
+// cur 指向区间尾
+// 当 cur 与 start 重复时
+// 将 start 移动至重复元素之后
+
+// 使用hash表保存元素下标
+
 class Solution {
 public:
-    int lengthOfLongestSubstring(std::string s) {
-    	int llen = 0;
-    	int start = 0;
-    	int end = 0;
+	int lengthOfLongestSubstring(string s) {
+		int start = 0;
+		int cur = 0;
+		int maxLen = 0;
 
-    	bool hashTable[256];
-    	memset(hashTable, false, sizeof(hashTable));
-    	
-    	while (true) {
-	    	while (end < s.length() && !hashTable[s[end]]) {
-	    		hashTable[s[end]] = true;
-	    		++end;
-	    	}
+		int hashTable[256];
+		memset(hashTable, 0, sizeof(hashTable));
 
-	    	if (end - start > llen) {
-	    		llen = end - start;
-	    	}
+		while (!(s.length() - start < maxLen)) { // 可能的最大不重复子串长度 >= maxLen
+			while (cur < s.length() && hashTable[s[cur]] == 0) {
+				hashTable[s[cur]] = cur + 1; // 下标 + 1
+				++cur;
+			}
 
-	    	if (end == s.length()) {
-	    		break;
-	    	}
+			int tmpLen = cur - start;
+			if (tmpLen > maxLen) {
+				maxLen = tmpLen;
+			}
 
-	    	for (int i = start; i < end; ++i) {
-	    		if (s[i] == s[end]) {
-	    			start = i + 1;
-	    			break;
-	    		}
-	    		hashTable[s[i]] = true;
-	    	}
+			if (cur == s.length()) {
+				break;
+			}
 
-	    	hashTable[s[end]] = true;
-	    	++end;
-    	}
+			int tmp = hashTable[s[cur]];
 
-    	return llen;
-    }
+			// 清除之前出现的元素
+			for (int i = start; i < hashTable[s[cur]]; ++i) {
+				hashTable[s[i]] = 0;
+			}
+
+			start = tmp;
+		}
+
+		return maxLen;
+	}
 };
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
 	Solution solution;
-	std::string test("AAAAAaa");
-	std::cout << solution.lengthOfLongestSubstring(test) << std::endl;
+	string test("anviaj");
+	cout << solution.lengthOfLongestSubstring(test) << endl;
 	return 0;
 }
