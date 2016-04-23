@@ -1,6 +1,11 @@
 #include <iostream>
+#include <climits>
 
 using namespace std;
+
+// 注意溢出判断
+// <= INT_MAX / 10
+// <= INT_MAX - lb
 
 class Solution {
 public:
@@ -17,18 +22,18 @@ public:
 
         while (x) {
         	int lb = x % 10;
-        	int ext = tmp * 10;
 
-        	if (ext % 10 != 0) { // overflow
-        		return 0;
-        	}
+            if (tmp <= INT_MAX / 10) {
+                tmp *= 10;
+                if (tmp <= INT_MAX - lb) {
+                    tmp += lb;
+                } else {
+                    return 0;
+                }
+            } else {
+                return 0;
+            }
 
-        	int ext2 = ext + lb;
-        	if (ext2 < 0) {
-        		return 0;
-        	}
-
-        	tmp = ext2;
         	x /= 10;
         }
 
