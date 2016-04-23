@@ -2,6 +2,18 @@
 #include <string>
 #include <iostream>
 
+// 方法1
+// 枚举回文串的中心位置
+// 时间复杂度O(n^2)
+//
+// 方法2
+// 动态规划
+// P[i, j] 表示字符串s[i] - s[j]是否为回文
+// P[i, j] = (s[i] == s[j] && p[i + 1, j - 1])
+// 枚举长度即可
+// 时间复杂度O(n^2)
+// 空间复杂度O(n^2)
+//
 class Solution {
 public:
 	Solution():maxLen(0) {};
