@@ -3,6 +3,12 @@
 
 using namespace std;
 
+// 天了噜
+// 想了一会儿完全木有思路
+//
+// 只能参考大神的思路来理解咯
+// 好吧一般来说迭代的是人，递归的是神-_-
+
 class Solution {
 public:
     bool isMatch(string s, string p) {
