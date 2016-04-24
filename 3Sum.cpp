@@ -4,6 +4,24 @@
 
 using namespace std;
 
+// 方法1
+// 枚举[x, y, z]
+// for 
+//     for
+//         for
+// O(n^3)
+
+// 方法2
+// 排序
+// 枚举x
+// y = x + 1
+// z = end - 1
+// sum = x + y + z
+// sum == 0，找到符合条件的解，之后注意跳过相同元素
+// sum > 0，--z
+// sum < 0，++y
+// O(n^2)
+
 class Solution {
 public:
     vector<vector<int> > threeSum(vector<int> &num) {
