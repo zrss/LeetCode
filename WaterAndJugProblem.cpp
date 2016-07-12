@@ -32,6 +32,22 @@ using namespace std;
 // okay, speed is far too slow
 // okay, view the discuss, omg, it is a GCD problem -_-
 
+// return (z % (GCD(x, y)) == 0)
+
+// actually, it can use BFS method to travel all states
+
+// initial (0, 0)
+// currently (a, b)
+// input x, y, z
+// once a + b == z return true
+// then we have
+// (1) fill first bucket (x, b)
+// (2) fill second bucket (a, y)
+// (3) empty first bucket (0, b)
+// (4) empty second bucket (a, 0)
+// (5) pour the first bucket to the second bucket (if a < (y - b) 0 else a - (y - b), min(y, a + b))
+// (6) pour the second bucket to the first bucket (min(x, a + b), if b < (x - a) 0 else b - (x - a))
+
 class Solution {
 public:
     bool canMeasureWater(int x, int y, int z) {
