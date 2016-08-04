@@ -3,7 +3,11 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <list>
-#include <algorithm>
+
+// a mess code
+// to long to maintain
+// brute force method
+// each user maintain its recent_list, follow_set, history_list
 
 using namespace std;
 
@@ -17,25 +21,20 @@ struct Tweet {
     Tweet(const Tweet& c): user_id(c.user_id), tweet_id(c.tweet_id), sequence(c.sequence) {}
 };
 
-bool cmp(Tweet& t1, Tweet& t2) {
-    return t1.sequence > t2.sequence;
-}
-
-struct User {
+class User {
     static int glo_seq_num;
 
-    int user_id;
-
+public:
     User(int u_id): user_id(u_id) {
         follow_set.insert(u_id);
-        recent_len = 0;
     }
 
-    Tweet recent_tweets[10];
-    int recent_len;
-
-    unordered_set<int> follow_set;
-    vector<Tweet> history_tweets;
+    Tweet postTweet(int tweetId) {
+        Tweet tweet(user_id, tweetId, glo_seq_num++);
+        history_tweets.push_back(tweet);
+        addRecentTweet(tweet);
+        return tweet;
+    }
 
     void follow(int followerId, vector<Tweet> follower_tweets) {
         if (follow_set.count(followerId) > 0) {
@@ -55,49 +54,32 @@ struct User {
             return;
         }
 
-        // p1 point to not followerId tweet
-        // p2 point to unkown followerId tweet
-        int p1 = -1;
-        int p2 = 0;
-        while (p2 < recent_len) {
-            while (p2 < recent_len && recent_tweets[p2].user_id == followerId) {
-                ++p2;
-            }
-            if (p2 < recent_len) {
-                swap(recent_tweets[++p1], recent_tweets[p2++]);
+        for (auto itr = recent_tweets.begin(); itr != recent_tweets.end(); ) {
+            if (itr->user_id == followerId) {
+                itr = recent_tweets.erase(itr);
+            } else {
+                ++itr;
             }
         }
-
-        recent_len = p1 + 1;        
+              
         follow_set.erase(followerId);
-    }
-
-    Tweet postTweet(int tweetId) {
-        Tweet tweet(user_id, tweetId, glo_seq_num++);
-        history_tweets.push_back(tweet);
-        addRecentTweet(tweet);
-        return tweet;
     }
 
     void addRecentTweet(Tweet tweet) {
         if (follow_set.count(tweet.user_id) == 0) {
             return;
         }
-        if (recent_len == 10) {
-            make_heap(&recent_tweets[0], &recent_tweets[recent_len], cmp);
-            pop_heap(&recent_tweets[0], &recent_tweets[recent_len], cmp);
-            --recent_len;
+        auto itr = recent_tweets.begin();
+        bool tail = true;
+        for (; tail && itr != recent_tweets.end(); ++itr) {
+            if (itr->sequence < tweet.sequence) {
+                recent_tweets.insert(itr, tweet);
+                tail = false;
+            }
         }
-        recent_tweets[recent_len++] = tweet;
-    }
-
-    vector<int> getRecentTweet() {
-        sort(recent_tweets, recent_tweets + recent_len, cmp);
-        vector<int> result(recent_len, 0);
-        for (int i = 0; i < recent_len; ++i) {
-            result[i] = recent_tweets[i].tweet_id;
+        if (tail) {
+            recent_tweets.push_back(tweet);
         }
-        return result;
     }
 
     vector<Tweet> getLastHistoryTweet() {
@@ -106,6 +88,23 @@ struct User {
         }
         return vector<Tweet>(history_tweets.rbegin(), history_tweets.rbegin() + 10);
     }
+
+    vector<int> getRecentTweet() {
+        vector<int> result;
+        int num = recent_tweets.size() < 10 ? recent_tweets.size() : 10;
+        auto itr = recent_tweets.begin();
+        for (int i = 0; i < num; ++i) {
+            result.push_back(itr->tweet_id);
+            ++itr;
+        }
+        return result;
+    }
+
+private:
+    int user_id;
+    list<Tweet> recent_tweets;
+    vector<Tweet> history_tweets;
+    unordered_set<int> follow_set;
 };
 
 int User::glo_seq_num = 0;
@@ -176,7 +175,7 @@ private:
  }
 
  int main(int argc, char const *argv[]) {
-     Twitter twitter;
+    Twitter twitter;
 
     twitter.postTweet(1, 1);
     twitter.postTweet(1, 2);
@@ -191,10 +190,7 @@ private:
     twitter.postTweet(1, 11);
     twitter.postTweet(1, 12);
 
-    debugPrint(twitter.getNewsFeed(1));
-
-    
-
+    debugPrint(twitter.getNewsFeed(2));
      
-     return 0;
+    return 0;
  }
