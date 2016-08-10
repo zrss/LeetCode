@@ -1,110 +1,46 @@
 #include <iostream>
-#include <vector>
 #include <cstdlib>
+#include <unordered_set>
 
 using namespace std;
-
-const int SIZE = 4096;
-
-struct HashNode {
-    int val;
-
-    HashNode(): val(0), next(NULL) {}
-    HashNode(int v): val(v), next(NULL) {}
-
-    HashNode* next;
-};
 
 class RandomizedSet {
 public:
     /** Initialize your data structure here. */
-    RandomizedSet(): keyNum(0) {
+    RandomizedSet() {
     }
     
     /** Inserts a value to the set. Returns true if the set did not already contain the specified element. */
     bool insert(int val) {
-        int hashVal = hashCode(val);
-
-        HashNode* cur = &array[hashVal];
-        while (cur->next != NULL) {
-            if (cur->next->val == val) {
-                return false;
-            }
-            cur = cur->next;
-        }
-
-        cur->next = new HashNode(val);
-        ++keyNum;
-        return true;
+        pair<unordered_set<int>::iterator,bool> rel = set.insert(val);
+        return rel.second;
     }
     
     /** Removes a value from the set. Returns true if the set contained the specified element. */
     bool remove(int val) {
-        int hashVal = hashCode(val);
-
-        HashNode* cur = &array[hashVal];
-        while (cur->next != NULL) {
-            if (cur->next->val == val) {
-                HashNode* target = cur->next;
-                cur->next = cur->next->next;
-                --keyNum;
-                delete target;
-                return true;
-            }
-        }
-
-        return false;
+        int rel = set.erase(val);
+        return rel;
     }
     
     /** Get a random element from the set. */
     int getRandom() {
-        if (keyNum == 0) {
+        if (set.size() == 0) {
             return 0;
         }
 
-        int hashVal = 0;
-        do {
-            hashVal = rand() % SIZE;
-        } while (array[hashVal].next == NULL);
-
-        // list len
-        int len = 0;
-        HashNode* cur = array[hashVal].next;
-        while (cur != NULL) {
-            ++len;
-            cur = cur->next;
-        }
-
-        int pos = rand() % len;
+        int r = rand() % set.size();
         int cnt = 0;
-        cur = array[hashVal].next;
-        while (cnt < pos) {
+        auto itr = set.begin();
+        while (cnt < r) {
             ++cnt;
-            cur = cur->next;
+            ++itr;
         }
 
-        return cur->val;
+        return *itr;
     }
-
-    int hashCode(int val) {
-        return val & (SIZE - 1);
-    }
-
-/*    ~RandomizedSet() {
-        for (int i = 0; i < SIZE; ++i) {
-            HashList& hashList = array[i];
-            HashNode* cur = &hashList.vHead;
-            while (cur != NULL) {
-                HashNode* tmp = cur;
-                cur = cur->next;
-                delete tmp;
-            }
-        }
-    }*/
 
 private:
-    int keyNum;
-    HashNode array[SIZE];
+    unordered_set<int> set;
 };
 
 /**
