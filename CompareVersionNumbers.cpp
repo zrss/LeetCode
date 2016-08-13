@@ -3,91 +3,113 @@
 
 using namespace std;
 
+// 太考验细心程度
+// 以及细节处理能力了
+// 样例 0.1 vs 0.0.1
+// 样例 1.1 vs 1.10
+// 样例 1.2 vs 1.10
+
 class Solution {
 public:
     int compareVersion(string version1, string version2) {
-        int dv1 = version1.find('.');
-        int dv2 = version2.find('.');
+        int e1 = version1.size();
+        int e2 = version2.size();
 
-        int bv1 = trim(version1);
-        int bv2 = trim(version2);
+        int s1 = 0;
+        int s2 = 0;
+        int t1 = 0;
+        int t2 = 0;
 
-        if (dv1 == string::npos && dv2 == string::npos) {
-        	return compare(version1, bv1, version1.length(), version2, bv2, version2.length());
+        int rel = 0;
+
+        while (t1 < e1 && t2 < e2) {
+            t1 = findCH(version1, s1, e1, '.');
+            t2 = findCH(version2, s2, e2, '.');
+
+            removeLeadingZero(version1, s1, e1);
+            removeLeadingZero(version2, s2, e2);
+
+            rel = cmpVersion(version1, s1, t1, version2, s2, t2);
+            s1 = ++t1;
+            s2 = ++t2;
+
+            if (rel != 0) {
+                return rel;
+            }
         }
-        if (dv1 != string::npos && dv2 != string::npos) {
-        	int tmp = compare(version1, bv1, dv1, version2, bv2, dv2);
-        	if (tmp == 0) {
-        		tmp = compare(version1, dv1 + 1, version1.length(), version2, dv2 + 1, version2.length());
-        	}
-        	return tmp;
+
+        if (t1 >= e1 && t2 < e2) {
+            if (notZero(version2, t2, e2)) {
+                return -1;
+            }
         }
-        if (dv1 == string::npos) {
-        	int tmp = compare(version1, bv1, version1.length(), version2, bv2, dv2);
-        	if (tmp == 0) {
-        		return -1;
-        	}
-        	return tmp;
+        if (t1 < e1 && t2 >= e2) {
+            if (notZero(version1, t1, e1)) {
+                return 1;
+            }
         }
-        int tmp = compare(version1, bv1, dv1, version2, bv2, version2.length());
-        if (tmp == 0) {
-        	return 1;
-        }
-        return tmp;
+
+        return 0;
     }
 
-    vector<string> split(string& target, char flag) {
-    	vector<string> rel;
-    	int pre = 0;
-    	for (int i = 0; i < target.size(); ++i) {
-    		if (target[i] == flag) {
-    			if (pre != i - 1) {
-    				rel.push_back(target.substr(pre, i));
-    				pre = i + 1;
-    			}
-    		}
-    	}
+    // compare part
+    int cmpVersion(string& str1, int s1, int e1, string& str2, int s2, int e2) {
+        int l1 = e1 - s1;
+        int l2 = e2 - s2;
 
+        if (l1 != l2) {
+            return l1 < l2 ? -1 : 1;
+        }
+        else {
+            while (s1 < e1 && str1[s1] == str2[s2]) {
+                ++s1;
+                ++s2;
+            }
+
+            if (s1 == e1) {
+                return 0;
+            }
+            else {
+                if (str1[s1] < str2[s2]) {
+                    return -1;
+                }
+                else {
+                    return 1;
+                }
+            }
+        }
     }
 
-    int trim(string& str) {
-        int bv1 = 0;
-        for (; str[bv1] == '0' && bv1 < str.length(); ++bv1) {
+    // locate dot
+    int findCH(string& str, int s, int e, char ch) {
+        while (s < e && str[s] != ch) {
+            ++s;
         }
-        if (bv1 == str.length()) {
-        	--bv1;
-        }
-        return bv1;
+        return s;
     }
 
-    int compare(string& v1, int bv1, int ev1, string& v2, int bv2, int ev2) {
-    	int c1 = ev1 - bv1;
-    	int c2 = ev2 - bv2;
+    int removeLeadingZero(string& str, int& s, int& e) {
+        while (s < e && str[s] == '0') {
+            ++s;
+        }
+        if (s == e) { // 0
+            return s - 1;
+        }
+        return s;
+    }
 
-    	int gap = c1 - c2;
-
-    	if (gap < 0) { // c2 > c1
-    		return -1;
-    	} else if (gap > 0) { // c1 > c2
-    		return 1;
-    	} else { // c1 == c2
-    		for (int i = 0; i < c1; ++i) {
-    			int tmp = v1[bv1++] - v2[bv2++];
-    			if (tmp < 0) {
-    				return -1;
-    			} else if (tmp > 0) {
-    				return 1;
-    			}
-    		}
-    	}
-
-    	return 0;
+    bool notZero(string& str, int s, int e) {
+        while (s < e && str[s] == '0' || str[s] == '.') {
+            ++s;
+        }
+        return s < e;
     }
 };
 
-int main(int argc, char const *argv[])
-{
-	Solution solution;
-	cout << solution.compareVersion("010", "1") << endl;
-	return 0;
+int main(int argc, char const *argv[]) {
+    Solution solution;
+    string s1 = "121";
+    string s2 = "321";
+    cout << solution.compareVersion(s1, s2) << endl;
+    return 0;
 }
