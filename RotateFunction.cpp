@@ -31,9 +31,7 @@ typedef vector<vector<int> >        VVI;
 typedef vector<string>              VS;
 typedef vector<vector<string> >     VVS;
 
-// deque solution
-// t O(n)
-// s O(n)
+// tricky solution
 
 class Solution {
 public:
@@ -43,35 +41,20 @@ public:
     	}
 
     	int len = A.size();
-    	int maxSum = INT_MIN;
 
-    	int cnt = A.size();
-    	int t = 0;
-
-    	deque<int> dq;
     	int totalSum = 0;
     	int sum = 0;
     	for (int i = 0; i < len; ++i) {
     		totalSum += A[i];
-    		dq.push_back(A[i]);
     		sum += i * A[i];
     	}
 
-    	maxSum = max(maxSum, sum);
-    	--cnt;
+    	int maxSum = sum;
 
-    	while (t < cnt) {
-    		int remainNum = dq.front();
-
-    		sum += (totalSum - dq.front());
-    		sum -= (dq.back() * len);
-    		sum += remainNum;
-
+   		for (int i = len - 2; i >= 0; --i) {
+    		sum += (totalSum - A[i + 1]);
+    		sum -= (A[i + 1] * (len - 1));
     		maxSum = max(maxSum, sum);
-
-    		dq.push_front(dq.back());
-    		dq.pop_back();
-	        ++t;
     	}
 
     	return maxSum;
