@@ -35,38 +35,35 @@ typedef vector<vector<string> >     VVS;
 
 class Solution {
 public:
-    int integerReplacement(int n) {
-		if (n == INT_MAX) { // special case
+	int integerReplacement(int n) {
+		if (n == INT_MAX) { // a special case
 			return 32;
 		}
 
-    	int cnt = 0;
-
-    	while (n != 1) {
-    		if (n & 1) {
-    			// special case
-    			if (n == 3) {
-    				cnt += 2;
-    				return cnt;
-    			}
-
-	        	// [1] = 1 +
-	        	// [1] = 0 -
-	        	if (0x02 & n) {
-	        		++n;
-	        	} else {
-	        		--n;
-	        	}
-
-	        	++cnt;
-	        } else {
-	        	n >>= 1;
-	        	++cnt;
-	        }
-    	}
-        
-        return cnt;
-    }
+		int cnt = 0;
+		while (n != 1) {
+			if (n & 1) {
+	            // a special case
+	            if (n == 3) { // 11 -> 10 -> 1 not 11 -> 100 -> 10 -> 1
+	            	cnt += 2;
+	            	return cnt;
+	            }
+		        // [1] = 1 -> +
+		        // [1] = 0 -> -
+		        if (0x02 & n) { // add one will change 111 -> 1000
+		        	++n;
+		        } else {
+	                    // for example as n = 10001 just change to 10000 (minus one)
+		        	--n;
+		        }
+		    } else {
+		    	n >>= 1;
+		    }
+		    ++cnt;
+		}
+			
+		return cnt;
+	}
 };
 
 int main() {
