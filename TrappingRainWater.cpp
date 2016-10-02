@@ -3,66 +3,44 @@
 
 using namespace std;
 
+// 计算每个格子的藏水量 cur
+// 与该格子的左边最高的隔板高度 lmax
+// 及该格子的右边最高的隔板高度 rmax 有关 
+// 藏水量为 min(lmax, rmax) - cur
+
+// 双指针扫描
+// Time O(n)
+// Space O(1)
+
 class Solution {
 public:
-    int trap(vector<int>& height) {
-    	if (height.size() == 0) {
-    		return 0;
-    	}
+    /**
+    * @param heights: a vector of integers
+    * @return: a integer
+    */
+    int trapRainWater(vector<int> &heights) {
+        // write your code here
 
-    	int water = 0;
-    	int preIndex = 0;
-    	int preHeight = 0;
+        int l = 0;
+        int r = heights.size() - 1;
 
-    	// 找到第一个高度非0的bar
-    	while (preIndex < height.size() - 1 && height[preIndex] == 0) {
-    		++preIndex;
-    	}
+        int lmax = 0;
+        int rmax = 0;
 
-    	if (preIndex == height.size() - 1) {
-    		return 0;
-    	}
+        int water = 0;
+        while (l < r) {
+            lmax = max(lmax, heights[l]);
+            rmax = max(rmax, heights[r]);
 
-    	// 遍历
-    	while (preIndex < height.size()) {
-    		preHeight = height[preIndex];
-
-    		// 寻找更高的或相等的bar
-    		// 同时记录遍历过的最高的bar
-    		// 如果寻找不到更高的或相等的bar时，使用记录值计算
-    		int next = preIndex + 1;
-    		int minHeight = 0;
-    		int minIndex = next;
-
-	    	while (next < height.size() && height[next] < preHeight) {
-	    		if (height[next] > minHeight) {
-	    			minHeight = height[next];
-	    			minIndex = next;
-	    		}
-	    		++next;
-	    	}
-
-	    	// 如果找到
-	    	if (next != height.size()) {
-	    		water += (preHeight * (next - preIndex - 1)); // 计算总面积
-
-	    		for (int i = preIndex + 1; i < next; ++i) { // 减去中间bar面积
-	    			water -= height[i];
-	    		}
-
-	    		preIndex = next; // 从找到的bar开始下一次的迭代
-	    	} else {
-	    		water += (minHeight * (minIndex - preIndex - 1)); // 计算总面积
-
-	    		for (int i = preIndex + 1; i < minIndex; ++i) { // 减去中间bar面积
-	    			water -= height[i];
-	    		}
-
-	    		preIndex = minIndex; // 从次高的bar开始
-	    	}
-    	}
-
-    	return water;
+            if (lmax < rmax) {
+                water += (lmax - heights[l++]);
+            }
+            else {
+                water += (rmax - heights[r--]);
+            }
+        }
+        
+        return water;
     }
 };
 
