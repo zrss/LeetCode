@@ -9,41 +9,64 @@
 
 // time complexity O(k * n)
 
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
+#include <string>
+#include <cstring>
+#include <sstream>
+#include <bitset>
+#include <cmath>
+#include <iomanip>
+#include <vector>
+#include <list>
+#include <stack>
+#include <queue>
+#include <deque>
+#include <set>
+#include <map>
 #include <algorithm>
+#include <climits>
+#include <ctime>
+#include <cctype>
+#include <functional>
+#include <utility>
+#include <numeric>
 
 using namespace std;
+
+// 极大堆
+struct mycmp {
+    bool operator() (pair<int, int>& p1, pair<int, int>& p2) {
+        return p1.first + p1.second < p2.first + p2.second;
+    }
+};
 
 class Solution {
 public:
     vector<pair<int, int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2, int k) {
-        int itr1 = 0;
-        int itr2 = 0;
-        vector<int> d(nums1.size(), 0);
-        bool cont = true;
+        priority_queue<pair<int, int>, vector<pair<int, int> >, mycmp> pq;
 
-        vector<pair<int, int>> result;
+        int l1 = min(k, (int)nums1.size());
+        int l2 = min(k, (int)nums2.size());
 
-        for (int r = 0; cont && r < k; ++r) {    
-            int min = 0x7FFFFFFF;
-            int index = -1;
-            for (int i = 0; i < nums1.size(); ++i) {
-                if (d[i] < nums2.size()) {
-                    int tmp = nums1[i] + nums2[d[i]];
-                    if (tmp <= min) {
-                        min = tmp;
-                        index = i;
-                    }
+        for (int i = 0; i < l1; ++i) {
+            for (int j = 0; j < l2; ++j) {
+                if (pq.size() < k) {
+                    pq.push(make_pair(nums1[i], nums2[j]));
                 }
-            }
-            if (index != -1) {
-                result.push_back(pair<int, int>(nums1[index], nums2[d[index]]));
-                ++d[index];
-            } else {
-                cont = false;
+                else if (nums1[i] + nums2[j] < (pq.top().first + pq.top().second)) {
+                    pq.pop();
+                    pq.push(make_pair(nums1[i], nums2[j]));
+                }
             }
         }
 
+        vector<pair<int, int>> result;
+        while (!pq.empty()) {
+            result.push_back(pq.top());
+            pq.pop();
+        }
         return result;
     }
 };
