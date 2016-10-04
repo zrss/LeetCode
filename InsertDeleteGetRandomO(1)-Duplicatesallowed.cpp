@@ -1,8 +1,3 @@
-#include <iostream>
-#include <multiset>
-
-using namespace std;
-
 class RandomizedCollection {
 public:
     /** Initialize your data structure here. */
@@ -12,40 +7,47 @@ public:
     
     /** Inserts a value to the collection. Returns true if the collection did not already contain the specified element. */
     bool insert(int val) {
-        bool rel = false
-        if (set.find(val) != set.end()) {
+        bool rel = false;
+        unordered_map<int, vector<int>>::iterator itr = m.find(val);
+        if (itr == m.end()) {
             rel = true;
         }
-        set.insert(val);
+        
+        m[val].push_back(nums.size());
+        nums.push_back(make_pair(val, m[val].size() - 1));
+        
         return rel;
     }
     
     /** Removes a value from the collection. Returns true if the collection contained the specified element. */
     bool remove(int val) {
-        multiset<int>::iterator itr = set.find(val);
-        if (itr == set.end()) {
+        unordered_map<int, vector<int>>::iterator itr = m.find(val);
+        if (itr == m.end()) {
             return false;
         }
-
-        multiset<int>::iterator last = itr;
-        ++last;
-
-        multiset.erase(itr, last);
+        
+        pair<int, int> last = nums.back();
+        m[last.first][last.second] = m[val].back();
+        nums[m[val].back()] = last;
+        
+        m[val].pop_back();
+        
+        if (m[val].size() == 0)
+            m.erase(val);
+            
+        nums.pop_back();
+        
         return true;
     }
     
     /** Get a random element from the collection. */
     int getRandom() {
-        int r = rand() % set.size();
-        auto itr = set.begin();
-        for (int c = 0; c < r; ++c) {
-            ++itr;
-        }
-        return *itr;
+        return nums[rand() % nums.size()].first;
     }
-
+    
 private:
-    multiset<int> set;
+    vector<pair<int, int>> nums;
+    unordered_map<int, vector<int>> m;
 };
 
 /**
