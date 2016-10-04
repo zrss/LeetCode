@@ -30,6 +30,9 @@ using namespace std;
 // x + y
 // ~(-x) + 1 + y
 
+// 位操作
+// 对应位都为 1 才进位
+
 class Solution {
 public:
     int getSum(int a, int b) {
