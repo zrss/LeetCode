@@ -9,38 +9,41 @@ public:
     /** Initialize your data structure here. */
     RandomizedSet() {
     }
-    
+
     /** Inserts a value to the set. Returns true if the set did not already contain the specified element. */
     bool insert(int val) {
-        pair<unordered_set<int>::iterator,bool> rel = set.insert(val);
-        return rel.second;
+        map<int, int>::iterator itr = indexMap.find(val);
+        if (itr != indexMap.end()) {
+            return false;
+        }
+
+        indexMap.insert(make_pair(val, arrays.size()));
+        arrays.push_back(val);
+        return true;
     }
-    
+
     /** Removes a value from the set. Returns true if the set contained the specified element. */
     bool remove(int val) {
-        int rel = set.erase(val);
-        return rel;
+        map<int, int>::iterator itr = indexMap.find(val);
+        if (itr == indexMap.end())
+            return false;
+
+        indexMap[arrays.back()] = itr->second;
+        arrays[itr->second] = arrays.back();
+        arrays.pop_back();
+
+        indexMap.erase(itr);
+        return true;
     }
-    
+
     /** Get a random element from the set. */
     int getRandom() {
-        if (set.size() == 0) {
-            return 0;
-        }
-
-        int r = rand() % set.size();
-        int cnt = 0;
-        auto itr = set.begin();
-        while (cnt < r) {
-            ++cnt;
-            ++itr;
-        }
-
-        return *itr;
+        return arrays[rand() % arrays.size()];
     }
 
 private:
-    unordered_set<int> set;
+    map<int, int> indexMap;
+    vector<int> arrays;
 };
 
 /**
