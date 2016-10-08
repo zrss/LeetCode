@@ -4,35 +4,41 @@
 
 using namespace std;
 
-// reverse with sort
-// min heap
+// 固定大小为K的最小堆
 
-struct cmp {
-    bool operator() (pair<int, int>& a, pair<int, int>& b) {
-        return a.second > b.second;
+struct comp {
+    bool operator() (const pair<int, int>& p1, const pair<int, int>& p2) {
+        return p1.second > p2.second;
     }
 };
 
 class Solution {
 public:
     vector<int> topKFrequent(vector<int>& nums, int k) {
-        unordered_map<int, int> element_cnt;
-        for (int i = 0; i < nums.size(); ++i) {
-            ++element_cnt[nums[i]];
+        unordered_map<int, int> cntMap;
+        for (int num : nums) {
+            ++cntMap[num];
         }
 
-        priority_queue<pair<int, int>, vector<pair<int, int>>, cmp> min_heap;
-        for (auto itr = element_cnt.begin(); itr != element_cnt.end(); ++itr) {
-            min_heap.push(pair<int, int>(itr->first, itr->second));
-            if (min_heap.size() > k) {
-                min_heap.pop();
+        priority_queue<pair<int, int>, vector<pair<int, int>>, comp> pq;
+        for (auto p : cntMap) {
+            if (pq.size() == k) {
+                if (p.second > pq.top().second) {
+                    pq.pop();
+                    pq.push({ p.first, p.second });
+                }
+            }
+            else {
+                pq.push({ p.first, p.second });
             }
         }
 
         vector<int> result;
-        while (!min_heap.empty()) {
-            result.push_back((min_heap.top()).first);
-            min_heap.pop();
+        while (!pq.empty()) {
+            pair<int, int> p = pq.top();
+            pq.pop();
+            
+            result.push_back(p.first);
         }
 
         return result;
