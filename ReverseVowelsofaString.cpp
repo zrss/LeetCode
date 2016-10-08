@@ -1,30 +1,30 @@
 // easy problem
-// use vIndex to store the index of vowels
-// then use two pointers to reverse vIndex and corresponding string s real index
+
+// 双指针
 
 class Solution {
 public:
     string reverseVowels(string s) {
-        vector<int> vIndex;
-        
-        for (int i = 0; i < s.length(); ++i) {
-            switch (s[i]) {
-                case 'a':case 'e':case 'i':case 'o':case 'u':case 'A':case 'E':case 'I':case 'O':case 'U':
-                    vIndex.push_back(i);
-                break;
+        int l = 0;
+        int r = s.length() - 1;
+
+        while (l < r) {
+            while (l < r && !isVowel(s[l])) {
+                ++l;
             }
-        }
-        
-        // [sPtr, ePtr]
-        int sPtr = 0;
-        int ePtr = (int)vIndex.size() - 1;
-        
-        while (sPtr < ePtr) {
-            swap(s[vIndex[sPtr]], s[vIndex[ePtr]]);
-            ++sPtr;
-            --ePtr;
+
+            while (l < r && !isVowel(s[r])) {
+                --r;
+            }
+
+            swap(s[l++], s[r--]);
         }
         
         return s;
+    }
+
+    bool isVowel(char ch) {
+        return (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u')
+            || (ch == 'A' || ch == 'E' || ch == 'I' || ch == 'O' || ch == 'U');
     }
 };
