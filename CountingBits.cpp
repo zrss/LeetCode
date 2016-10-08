@@ -29,26 +29,16 @@ using namespace std;
 class Solution {
 public:
     vector<int> countBits(int num) {
-        vector<int> rel;
-        if (num < 0) {
-            return rel;
-        }
-
-        rel.resize(num + 1);
-        int len = 1;
-        
-        int next = 1;
-        int start = 0;
-
-        while (next <= num) {
-            while (next <= num && start < len) {
-                rel[next++] = rel[start++] + 1;
+        vector<int> result(num + 1, 0);
+        int cnt = num + 1;
+        int pos = 1;
+        while (pos < cnt) {
+            int len = pos;
+            for (int i = 0; pos < cnt && i < len; ++i) {
+                result[pos++] = result[i] + 1;
             }
-            len <<= 1;
-            start ^= start;
         }
-
-        return rel;
+        return result;
     }
 };
 
