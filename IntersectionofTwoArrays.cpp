@@ -3,12 +3,7 @@
 
 using namespace std;
 
-/*
-
-	set manipulation
-	may be there is a elegant method to solve it
-
-*/
+// 直接用set，匹配过的删除
 
 class Solution {
 public:
@@ -18,16 +13,13 @@ public:
     		uniqueNum1.insert(num);
     	}
 
-    	unordered_set<int> uniqueResult;
+        vector<int> result;
     	for (int num : nums2) {
-    		if (uniqueNum1.find(num) != uniqueNum1.end()) {
-    			uniqueResult.insert(num);    			
+            auto itr = uniqueNum1.find(num);
+    		if (itr != uniqueNum1.end()) {
+    			result.push_back(num);
+                uniqueNum1.erase(itr);
     		}
-    	}
-
-    	vector<int> result;
-    	for (int num : uniqueResult) {
-    		result.push_back(num);
     	}
 
     	return result;
