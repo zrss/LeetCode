@@ -20,31 +20,31 @@
 class NestedIterator {
 public:
     NestedIterator(vector<NestedInteger> &nestedList) {
-    	cur = 0;
-        flatten(nestedList);
-    }
-
-    void flatten(vector<NestedInteger>& nestedList) {
-    	for (int i = 0; i < nestedList.size(); ++i) {
-    		if (nestedList[i].isInteger()) {
-    			flatten_value.push_back(nestedList[i].getInteger());
-    		} else {
-    			flatten(nestedList[i].getList());
-    		}
-    	}
+        for (int i = (int)nestedList.size() - 1; i >= 0; --i) {
+            sN.push(nestedList[i]);
+        }
     }
 
     int next() {
-        return flatten_value[cur++];
+        int rel = sN.top().getInteger();
+        sN.pop();
+        return rel;
     }
 
     bool hasNext() {
-        return cur < flatten_value.size();
+        while (!sN.empty() && !sN.top().isInteger()) {
+            vector<NestedInteger> vn = sN.top().getList();
+            sN.pop();
+
+            for (int i = (int)vn.size() - 1; i >= 0; --i) {
+                sN.push(vn[i]);
+            }
+        }
+        return !sN.empty();
     }
 
 private:
-	vector<int> flatten_value;
-	int cur;
+    stack<NestedInteger> sN;
 };
 
 /**
