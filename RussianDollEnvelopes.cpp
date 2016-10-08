@@ -1,31 +1,26 @@
-// 按先宽度升序，后高度升序排序
-// 然后常规的一维DP
+/*讨论区，有人给出了参考最长上升子序列的思路（可以优化到ＮlogN），只不过是二维，需要一些额外的考虑。
+
+排序时，先按宽度升序排序，保证从左向右遍历时，宽度是符合条件的。若宽度相等，则按高度降序排序。这样子从左向右遍历时，宽度可视作满足要求，
+使用高度作为LIS，这样保证LIS的最后一个元素尽可能小即可。*/
+
+
+bool cmp(pair<int, int> a, pair<int, int> b) {
+	return a.first < b.first || (a.first == b.first && a.second > b.second);
+}
 
 class Solution {
 public:
 	int maxEnvelopes(vector<pair<int, int>>& envelopes) {
-		if (envelopes.size() == 0)
-			return 0;
-		
-		sort(envelopes.begin(), envelopes.end());
+		int size = envelopes.size();
+		sort(envelopes.begin(), envelopes.end(), cmp);
 
-		int len = envelopes.size();
-		
-		vector<int> dp(len, 0);
-		dp[0] = 1;
-
-		int maxEnv = 1;
-		for (int i = 1; i < len; ++i) {
-			for (int j = 0; j < i; ++j) {
-				dp[i] = max(cover(envelopes[j], envelopes[i]) ? dp[j] + 1 : 1, dp[i]);
-			}
-			maxEnv = max(maxEnv, dp[i]);
+		vector<int> collector;
+		for (auto& pair : envelopes) {
+			auto iter = lower_bound(collector.begin(), collector.end(), pair.second);
+			if (iter == collector.end()) collector.push_back(pair.second);
+			else if (*iter > pair.second) *iter = pair.second;
 		}
 
-		return maxEnv;
-	}
-
-	bool cover(pair<int, int>& e1, pair<int, int>& e2) {
-		return (e1.first < e2.first && e1.second < e2.second);
+		return collector.size();
 	}
 };
