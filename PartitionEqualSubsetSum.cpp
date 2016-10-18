@@ -1,33 +1,27 @@
+// 位操作方法
+// 很巧妙
+// 左移与当前数字相同的位数，相当于之前的所有数字加上当前数字
+// 当然 |= 保留当前数字
+
+// 题目已经给出了限制
+// 0 < nums[i] <= 100
+// number of nums <= 200
+
+// 所以 bitset 最大为 100 * 200 / 2 + 1 = 10001
+
 class Solution {
 public:
     bool canPartition(vector<int>& nums) {
         int sum = 0;
 
+        // 0位为 1
+        bitset<10001> rel(1);
         int len = nums.size();
         for (int i = 0; i < len; ++i) {
             sum += nums[i];
+            rel |= (rel << nums[i]);
         }
 
-        // 奇数当然就不能划分咯
-        if ((sum & 1) != 0) {
-            return false;
-        }
-        sum >>= 1;
-
-        // 0-1 backpack
-        vector<bool> dp(sum + 1, false);
-        dp[0] = true;
-        
-        // 每个数字只能使用一次
-        for (int i = 0; i < len; ++i) {
-            // 从后往前避免重复使用
-            for (int j = sum; j >= nums[i]; --j) {
-                if (dp[j - nums[i]]) {
-                    dp[j] = dp[j - nums[i]];
-                }
-            }
-        }
-
-        return dp[sum];
+        return !(sum & 1) && bitset[sum >> 1];
     }
 };
