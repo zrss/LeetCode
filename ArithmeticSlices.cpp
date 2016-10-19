@@ -1,3 +1,10 @@
+// 扫描连续的等差数列
+// >= 3 为一个结果
+// 等差数列长度为 len
+// 则结果数为 (len - 3 + 1) + (len - 3) + ... + 1
+// 所以为 (len - 2) * (len - 1) / 2
+// 即 n * (n + 1) / 2
+
 class Solution {
 public:
 	int numberOfArithmeticSlices(vector<int>& A) {
