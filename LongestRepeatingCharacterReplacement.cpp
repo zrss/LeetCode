@@ -18,9 +18,17 @@ using namespace std;
 // 需要注意 k == 0 的情况
 // 即队列长度为 0
 
+// 解法2
+// discuss 中说的滑动窗口，窗口开始位置为s，当前遍历位置为c
+// 思路比较清奇
+// 首先也是因为只需要考虑 26 个字母
+// 计算[s, c]间的字符总和 Sum, 以及出现次数最大的字符数 Max
+// 因此需要 Sum - Max 次可以调整[s, c]为全部重复的字符
+// 当 Sum - Max > k 时，移动窗口开始位置到下一个 s = s + 1
+
 class Solution {
 public:
-    int characterReplacement(string s, int k) {
+    int characterReplacement1(string s, int k) {
         int len = s.length();
         int maxLen = 0;
 
@@ -52,6 +60,39 @@ public:
         }
 
         return maxLen;   
+    }
+
+    int characterReplacement(string s, int k) {
+        int len = s.length();
+        int maxLen = 0;
+
+        int chCnt[26];
+        memset(chCnt, 0, sizeof(chCnt));
+
+        for (int start = 0, cur = 0; start < len; ++start) {
+            while (cur < len) { // 窗口右侧
+                ++chCnt[s[cur] - 'A'];
+                if (count(chCnt) > k) {
+                    --chCnt[s[cur] - 'A'];
+                    break;
+                }
+                ++cur;
+            }
+            maxLen = max(maxLen, cur - start);
+            --chCnt[s[start] - 'A']; // 窗口左侧
+        }
+
+        return maxLen;   
+    }
+
+    int count(int chCnt[]) {
+        int maxCnt = chCnt[0];
+        int sumCnt = chCnt[0];
+        for (int i = 1; i < 26; ++i) {
+            maxCnt = max(maxCnt, chCnt[i]);
+            sumCnt += chCnt[i];
+        }
+        return sumCnt - maxCnt;
     }
 };
 
