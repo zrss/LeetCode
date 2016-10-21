@@ -4,50 +4,49 @@
 
 using namespace std;
 
+// 回头看下年轻的自己
+// 当年只为做题
+// 做完不看 discuss, 不了解其他精彩的思路, 这也太没意思了
+
+// 其实换一个角度这个问题很简单
+// 直接按行存储就可以了
+// 当然这需要空间复杂度
+
+// 
+
 class Solution {
 public:
     string convert(string s, int numRows) {
-    	// ps!: numRows 大于实际上的行数
-    	if (numRows <= 1) {
-    		return s;
-    	}
+        if (numRows == 1)
+            return s;
 
-    	int gap = (numRows - 2) + numRows;
-    	string rel;
+        vector<vector<char>> rel(numRows, vector<char>());
+        int rowCnt = 0;
+        int len = s.length();
 
-    	vector<vector<int>> flag(numRows, vector<int>());
-    	flag[0].push_back(0);
+        bool down = true;
+        for (int i = 0; i < len; ++i) {
+            if (down) {
+                rel[rowCnt++].push_back(s[i]);
+            } else {
+                rel[rowCnt--].push_back(s[i]);
+            }
+            if (numRows != 2 && (rowCnt == numRows || rowCnt == 0)) {
+                down = !down;
+            }
+            if (rowCnt == numRows) {
+                rowCnt -= 2;
+            }
+        }
 
-    	for (int i = 1; i < numRows - 1; ++i) {
-    		flag[i].push_back(i);
-    		flag[i].push_back(gap - i);
-    	}
+        stringstream ss;
+        for (int i = 0; i < numRows; ++i) {
+            for (int j = 0; j < rel[i].size(); ++j) {
+                ss << rel[i][j];
+            }
+        }
 
-    	flag[numRows - 1].push_back(numRows - 1);
-
-    	for (int i = 0; i < numRows; ++i) {
-    		for (auto itr : flag[i]) {
-    			if (itr < s.length()) {
-					rel += s[itr];
-    			} else {
-    				break;
-    			}
-    		}
-
-    		int cur = 0;
-    		int tmpGap = gap;
-    		while (cur < s.length()) {
-	    		for (auto itr : flag[i]) {
-	    			cur = itr + tmpGap;
-	    			if (cur < s.length()) {
-	    				rel += s[cur];
-	    			}
-	    		}
-	    		tmpGap += gap;
-    		}
-    	}
-
-    	return rel;
+        return ss.str();
     }
 };
 
