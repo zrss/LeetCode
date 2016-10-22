@@ -10,39 +10,34 @@ using namespace std;
 
 // 使用hash表保存元素下标
 
+// -----------------------
+
+// 当年太年轻
+// 写一个更好的解法
+// beats 81%
+
+// 不需要清除之前出现的字符
+// 当出现字符的index > start 时认为是重复字符
+// 定向清除即可
+
+// O(n) 复杂度
+
 class Solution {
 public:
 	int lengthOfLongestSubstring(string s) {
-		int start = 0;
-		int cur = 0;
+		int start = -1; // 不包含
 		int maxLen = 0;
 
-		int hashTable[256];
-		memset(hashTable, 0, sizeof(hashTable));
+		int chIndex[256];
+		memset(chIndex, -1, sizeof(chIndex));
 
-		while (!(s.length() - start < maxLen)) { // 可能的最大不重复子串长度 >= maxLen
-			while (cur < s.length() && hashTable[s[cur]] == 0) {
-				hashTable[s[cur]] = cur + 1; // 下标 + 1
-				++cur;
+		int len = s.length();
+		for (int i = 0; i < len; ++i) {
+			if (chIndex[s[i]] > start) {
+				start = chIndex[s[i]];
 			}
-
-			int tmpLen = cur - start;
-			if (tmpLen > maxLen) {
-				maxLen = tmpLen;
-			}
-
-			if (cur == s.length()) {
-				break;
-			}
-
-			int tmp = hashTable[s[cur]];
-
-			// 清除之前出现的元素
-			for (int i = start; i < hashTable[s[cur]]; ++i) {
-				hashTable[s[i]] = 0;
-			}
-
-			start = tmp;
+			chIndex[s[i]] = i;
+			maxLen = max(maxLen, i - start);
 		}
 
 		return maxLen;
@@ -51,7 +46,7 @@ public:
 
 int main(int argc, char const *argv[]) {
 	Solution solution;
-	string test("anviaj");
+	string test("abba");
 	cout << solution.lengthOfLongestSubstring(test) << endl;
 	return 0;
 }
